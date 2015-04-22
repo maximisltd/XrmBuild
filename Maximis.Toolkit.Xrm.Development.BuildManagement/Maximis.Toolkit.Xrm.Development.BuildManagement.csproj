@@ -1,0 +1,150 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{44234D54-2250-4BC0-B819-45F5F35362BC}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Maximis.Toolkit.Xrm.Development.BuildManagement</RootNamespace>
+    <AssemblyName>Maximis.Toolkit.Xrm.Development.BuildManagement</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>maximis.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="ILMerge">
+      <HintPath>..\..\..\packages\ilmerge.2.14.1208\tools\ILMerge.exe</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Build" />
+    <Reference Include="Microsoft.Build.Framework" />
+    <Reference Include="Microsoft.Crm.Sdk.Proxy, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Microsoft.CrmSdk.CoreAssemblies.7.0.1\lib\net45\Microsoft.Crm.Sdk.Proxy.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Microsoft.IdentityModel.6.1.7600.16394\lib\net35\Microsoft.IdentityModel.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Client, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Maximis.Toolkit.Tfs\SDK Assemblies\Microsoft.TeamFoundation.Client.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.VersionControl.Client, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Maximis.Toolkit.Tfs\SDK Assemblies\Microsoft.TeamFoundation.VersionControl.Client.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="Microsoft.Xrm.Sdk, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Microsoft.CrmSdk.CoreAssemblies.7.0.1\lib\net45\Microsoft.Xrm.Sdk.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Actions\BaseAction.cs" />
+    <Compile Include="Actions\BaseImportExportAction.cs" />
+    <Compile Include="Actions\CleanUpAction.cs" />
+    <Compile Include="Actions\CreateOrgsAction.cs" />
+    <Compile Include="Actions\DeleteOrgsAction.cs" />
+    <Compile Include="Actions\DeployFromDiskAction.cs" />
+    <Compile Include="Actions\DeployAction.cs" />
+    <Compile Include="Actions\EnvSyncInAction.cs" />
+    <Compile Include="Actions\EnvSyncOutAction.cs" />
+    <Compile Include="Actions\ExportSolutionsAction.cs" />
+    <Compile Include="Actions\InitialiseAction.cs" />
+    <Compile Include="Actions\InternalSyncAction.cs" />
+    <Compile Include="Actions\RepairAction.cs" />
+    <Compile Include="Actions\SetupSecurityRolesAction.cs" />
+    <Compile Include="Actions\SetSolutionVersionAction.cs" />
+    <Compile Include="Actions\SetupAdminUsersAction.cs" />
+    <Compile Include="Actions\SetupSolutionsAction.cs" />
+    <Compile Include="Actions\FormsExportAction.cs" />
+    <Compile Include="Actions\StaticDataExportAction.cs" />
+    <Compile Include="Actions\FormsImportAction.cs" />
+    <Compile Include="Actions\StaticDataImportAction.cs" />
+    <Compile Include="Actions\StaticDataResetAction.cs" />
+    <Compile Include="Actions\TfsSyncPluginsAction.cs" />
+    <Compile Include="Actions\TfsSolutionCheckInAction.cs" />
+    <Compile Include="Actions\TfsSyncReportsAction.cs" />
+    <Compile Include="Config\CheckInNote.cs" />
+    <Compile Include="Config\CleanUpFolder.cs" />
+    <Compile Include="Config\FormConfig.cs" />
+    <Compile Include="Config\DataConfig.cs" />
+    <Compile Include="Config\DeploymentConfig.cs" />
+    <Compile Include="Config\EnvironmentConfig.cs" />
+    <Compile Include="Config\ILMergeConfig.cs" />
+    <Compile Include="Config\InternalSyncConfig.cs" />
+    <Compile Include="Config\OrganizationConfig.cs" />
+    <Compile Include="Config\SecurityRoleConfig.cs" />
+    <Compile Include="Config\TfsPluginConfig.cs" />
+    <Compile Include="Config\TfsConfig.cs" />
+    <Compile Include="Config\TfsSyncConfig.cs" />
+    <Compile Include="Config\UserConfig.cs" />
+    <Compile Include="Config\XrmBuildConfig.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\Maximis.Toolkit.Tfs\Maximis.Toolkit.Tfs.csproj">
+      <Project>{7bc5d970-ccb8-4cdf-b715-1f952088257e}</Project>
+      <Name>Maximis.Toolkit.Tfs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\XrmCustomise\Maximis.Toolkit.Xrm.Development.Customisation\Maximis.Toolkit.Xrm.Development.Customisation.csproj">
+      <Project>{10da097c-b0a5-48f6-87de-39adc44a91c2}</Project>
+      <Name>Maximis.Toolkit.Xrm.Development.Customisation</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Core\Maximis.Toolkit.Xrm\Maximis.Toolkit.Xrm.csproj">
+      <Project>{08eef357-26a6-49e2-b808-033cc671c200}</Project>
+      <Name>Maximis.Toolkit.Xrm</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Core\Maximis.Toolkit\Maximis.Toolkit.csproj">
+      <Project>{cef6d4dd-2646-47fc-b2b3-5fce20878800}</Project>
+      <Name>Maximis.Toolkit</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="maximis.snk" />
+    <None Include="Maximis.Toolkit.Xrm.Development.BuildManagement.nuspec" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

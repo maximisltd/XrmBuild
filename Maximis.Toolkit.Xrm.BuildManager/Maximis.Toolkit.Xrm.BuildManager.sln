@@ -1,0 +1,66 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30501.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Maximis.Toolkit.Xrm.BuildManager", "Maximis.Toolkit.Xrm.BuildManager.csproj", "{0363C571-0749-4452-86AE-7675E09D74A4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Maximis.Toolkit.Xrm.Development", "..\Maximis.Toolkit.Xrm.Development\Maximis.Toolkit.Xrm.Development.csproj", "{83CAB555-4FEA-44C8-AABC-B0DE5FD142BB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Maximis.Toolkit", "..\Maximis.Toolkit\Maximis.Toolkit\Maximis.Toolkit.csproj", "{CEF6D4DD-2646-47FC-B2B3-5FCE20878800}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Maximis.Toolkit.Tfs", "..\Maximis.Toolkit.Tfs\Maximis.Toolkit.Tfs\Maximis.Toolkit.Tfs.csproj", "{7BC5D970-CCB8-4CDF-B715-1F952088257E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Maximis.Toolkit.Xrm", "..\Maximis.Toolkit.Xrm\Maximis.Toolkit.Xrm\Maximis.Toolkit.Xrm.csproj", "{08EEF357-26A6-49E2-B808-033CC671C200}"
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 6
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://maximis.visualstudio.com/defaultcollection
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = Maximis.Toolkit.Xrm.BuildManager.csproj
+		SccLocalPath1 = .
+		SccProjectUniqueName2 = ..\\Maximis.Toolkit.Xrm.Development\\Maximis.Toolkit.Xrm.Development.csproj
+		SccProjectName2 = ../Maximis.Toolkit.Xrm.Development
+		SccLocalPath2 = ..\\Maximis.Toolkit.Xrm.Development
+		SccProjectUniqueName3 = ..\\Maximis.Toolkit\\Maximis.Toolkit\\Maximis.Toolkit.csproj
+		SccProjectName3 = ../Maximis.Toolkit/Maximis.Toolkit
+		SccLocalPath3 = ..\\Maximis.Toolkit\\Maximis.Toolkit
+		SccProjectUniqueName4 = ..\\Maximis.Toolkit.Tfs\\Maximis.Toolkit.Tfs\\Maximis.Toolkit.Tfs.csproj
+		SccProjectName4 = ../Maximis.Toolkit.Tfs/Maximis.Toolkit.Tfs
+		SccLocalPath4 = ..\\Maximis.Toolkit.Tfs\\Maximis.Toolkit.Tfs
+		SccProjectUniqueName5 = ..\\Maximis.Toolkit.Xrm\\Maximis.Toolkit.Xrm\\Maximis.Toolkit.Xrm.csproj
+		SccProjectName5 = ../Maximis.Toolkit.Xrm/Maximis.Toolkit.Xrm
+		SccLocalPath5 = ..\\Maximis.Toolkit.Xrm\\Maximis.Toolkit.Xrm
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0363C571-0749-4452-86AE-7675E09D74A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0363C571-0749-4452-86AE-7675E09D74A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0363C571-0749-4452-86AE-7675E09D74A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0363C571-0749-4452-86AE-7675E09D74A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83CAB555-4FEA-44C8-AABC-B0DE5FD142BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83CAB555-4FEA-44C8-AABC-B0DE5FD142BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83CAB555-4FEA-44C8-AABC-B0DE5FD142BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83CAB555-4FEA-44C8-AABC-B0DE5FD142BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CEF6D4DD-2646-47FC-B2B3-5FCE20878800}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEF6D4DD-2646-47FC-B2B3-5FCE20878800}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEF6D4DD-2646-47FC-B2B3-5FCE20878800}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEF6D4DD-2646-47FC-B2B3-5FCE20878800}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BC5D970-CCB8-4CDF-B715-1F952088257E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BC5D970-CCB8-4CDF-B715-1F952088257E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BC5D970-CCB8-4CDF-B715-1F952088257E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BC5D970-CCB8-4CDF-B715-1F952088257E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08EEF357-26A6-49E2-B808-033CC671C200}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08EEF357-26A6-49E2-B808-033CC671C200}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08EEF357-26A6-49E2-B808-033CC671C200}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08EEF357-26A6-49E2-B808-033CC671C200}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

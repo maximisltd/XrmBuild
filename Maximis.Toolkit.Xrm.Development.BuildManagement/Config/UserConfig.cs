@@ -1,4 +1,5 @@
-﻿using System.Xml.Serialization;
+﻿using System;
+using System.Xml.Serialization;
 
 namespace Maximis.Toolkit.Xrm.Development.BuildManagement.Config
 {
@@ -9,6 +10,9 @@ namespace Maximis.Toolkit.Xrm.Development.BuildManagement.Config
 
         [XmlAttribute]
         public string FirstName { get; set; }
+
+        [XmlAttribute]
+        public Guid Id { get; set; }
 
         [XmlAttribute]
         public string LastName { get; set; }

@@ -15,10 +15,7 @@ namespace Maximis.Toolkit.Xrm.Development.BuildManagement.Actions
         {
             // Get the Organizations which are configured for Import or Export
             EnvironmentConfig envConfig = config.Environments.SingleOrDefault(q => q.UniqueName == environmentName);
-            IEnumerable<OrganizationConfig> orgConfigs = GetOrgConfigs(envConfig, orgUniqueNames).Where(q => q.ImportData || q.ExportData.Any());
-
-            // Get the list of Entities to clear down
-            IEnumerable<string> entityTypes = orgConfigs.SelectMany(q => q.ExportData).Select(q => q.EntityName).Distinct();
+            IEnumerable<OrganizationConfig> orgConfigs = GetOrgConfigs(envConfig, orgUniqueNames).Where(q => q.ImportData || q.ExportData);
 
             // Loop through Organizations
             foreach (OrganizationConfig orgConfig in orgConfigs)
@@ -27,7 +24,7 @@ namespace Maximis.Toolkit.Xrm.Development.BuildManagement.Actions
                 using (OrganizationServiceProxy orgService = ServiceHelper.GetOrganizationServiceProxy(orgConfig.CrmContext))
                 {
                     // Loop through all Entities and delete if possible
-                    foreach (string entityType in entityTypes)
+                    foreach (string entityType in config.DataImportExport.Select(q => q.EntityName))
                     {
                         Trace.WriteLine(string.Format("Deleting '{0}'", entityType));
                         QueryExpression query = new QueryExpression(entityType);

@@ -22,7 +22,7 @@ namespace Maximis.Toolkit.Xrm.Development.BuildManagement.Actions
                     // Create each configured System Administrator
                     foreach (UserConfig user in envConfig.AdminUsers)
                     {
-                        SecurityHelper.CreateAdminUser(orgService, user.Username, user.FirstName, user.LastName, user.EmailAddress);
+                        SecurityHelper.CreateAdminUser(orgService, user.Username, user.FirstName, user.LastName, user.EmailAddress, user.Id);
                     }
                 }
             }

@@ -1,4 +1,5 @@
-﻿using System.Xml.Serialization;
+﻿using Maximis.Toolkit.Xrm.Development.Customisation;
+using System.Xml.Serialization;
 
 namespace Maximis.Toolkit.Xrm.Development.BuildManagement.Config
 {
@@ -8,6 +9,6 @@ namespace Maximis.Toolkit.Xrm.Development.BuildManagement.Config
         public string EntityName { get; set; }
 
         [XmlAttribute("FormType")]
-        public int FormType { get; set; }
+        public FormType FormType { get; set; }
     }
 }

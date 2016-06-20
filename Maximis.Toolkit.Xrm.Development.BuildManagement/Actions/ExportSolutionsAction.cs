@@ -9,7 +9,7 @@ namespace Maximis.Toolkit.Xrm.Development.BuildManagement.Actions
         {
             OutputDivider("Export Solutions");
             EnvironmentConfig envConfig = config.Environments.SingleOrDefault(q => q.UniqueName == environmentName);
-            ExportSolutions(envConfig.ExportPath, GetOrgConfigs(envConfig, orgUniqueNames));
+            ExportSolutions(envConfig.ExportPath, GetOrgConfigs(envConfig, orgUniqueNames), true);
         }
     }
 }

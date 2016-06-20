@@ -17,6 +17,9 @@ namespace Maximis.Toolkit.Xrm.Development.BuildManagement.Actions
 
             // STEP 4: Setup Publisher and Solutions
             new SetupSolutionsAction().PerformAction(config, environmentName, orgUniqueNames);
+
+            // STEP 5: Install Pre-Requisite Solutions
+            new InstallPreReqsAction().PerformAction(config, environmentName, orgUniqueNames);
         }
     }
 }

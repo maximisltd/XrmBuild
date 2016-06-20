@@ -11,6 +11,15 @@ namespace Maximis.Toolkit.Xrm.Development.BuildManagement.Config
 
         public List<ConditionExpression> Conditions { get; set; }
 
+        [XmlAttribute]
         public string EntityName { get; set; }
+
+        [XmlArrayItem("Attribute")]
+        public List<string> ExistingMatch { get; set; }
+
+        public List<OrderExpression> Orders { get; set; }
+
+        [XmlArrayItem("EntityName")]
+        public List<string> RelatedEntities { get; set; }
     }
 }

@@ -1,0 +1,291 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Actions.BaseAction" Collapsed="true">
+    <Position X="25.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAAIIAAAAAAAgQAAAgAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Actions\BaseAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Actions.BaseImportExportAction" Collapsed="true">
+    <Position X="18.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEIAACAAAAgEAAAAAAIAAAAAAAAAAQAAAEAAEAwAAA=</HashCode>
+      <FileName>Actions\BaseImportExportAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Actions.CleanUpAction" Collapsed="true">
+    <Position X="11.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Actions\CleanUpAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Actions.CreateOrgsAction" Collapsed="true">
+    <Position X="16.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Actions\CreateOrgsAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Actions.DeleteOrgsAction" Collapsed="true">
+    <Position X="23" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Actions\DeleteOrgsAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Actions.DeployAction" Collapsed="true">
+    <Position X="25.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Actions\DeployAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Actions.DeployFromDiskAction" Collapsed="true">
+    <Position X="29.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Actions\DeployFromDiskAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Actions.EnvSyncInAction" Collapsed="true">
+    <Position X="0.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Actions\EnvSyncInAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Actions.EnvSyncOutAction" Collapsed="true">
+    <Position X="34.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Actions\EnvSyncOutAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Actions.ExportSolutionsAction" Collapsed="true">
+    <Position X="14" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Actions\ExportSolutionsAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Actions.FormsExportAction" Collapsed="true">
+    <Position X="18.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Actions\FormsExportAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Actions.FormsImportAction" Collapsed="true">
+    <Position X="43.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Actions\FormsImportAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Actions.InitialiseAction" Collapsed="true">
+    <Position X="47.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Actions\InitialiseAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Actions.InternalSyncAction" Collapsed="true">
+    <Position X="32" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Actions\InternalSyncAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Actions.RepairAction" Collapsed="true">
+    <Position X="5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Actions\RepairAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Actions.SetSolutionVersionAction" Collapsed="true">
+    <Position X="7.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Actions\SetSolutionVersionAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Actions.SetupAdminUsersAction" Collapsed="true">
+    <Position X="36.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Actions\SetupAdminUsersAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Actions.SetupSecurityRolesAction" Collapsed="true">
+    <Position X="20.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAEAAAAAgAAAAAAAAAAAAAAAgAAAAAAAA=</HashCode>
+      <FileName>Actions\SetupSecurityRolesAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Actions.SetupSolutionsAction" Collapsed="true">
+    <Position X="45.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Actions\SetupSolutionsAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Actions.StaticDataExportAction" Collapsed="true">
+    <Position X="27.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Actions\StaticDataExportAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Actions.StaticDataImportAction" Collapsed="true">
+    <Position X="50" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Actions\StaticDataImportAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Actions.StaticDataResetAction" Collapsed="true">
+    <Position X="2.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Actions\StaticDataResetAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Actions.TfsSolutionCheckInAction" Collapsed="true">
+    <Position X="9.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Actions\TfsSolutionCheckInAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Actions.TfsSyncPluginsAction" Collapsed="true">
+    <Position X="38.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Actions\TfsSyncPluginsAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Actions.TfsSyncReportsAction" Collapsed="true">
+    <Position X="41" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Actions\TfsSyncReportsAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Config.CheckInNote" Collapsed="true">
+    <Position X="52.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>Config\CheckInNote.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Config.CleanUpFolder" Collapsed="true">
+    <Position X="54.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAQAAAAAAAAAAA=</HashCode>
+      <FileName>Config\CleanUpFolder.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Config.DataConfig" Collapsed="true">
+    <Position X="56" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAABAAAAAQAAAAAAABAAAAAAAAAAA=</HashCode>
+      <FileName>Config\DataConfig.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Config.DeploymentConfig" Collapsed="true">
+    <Position X="57.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAAAAAAAAAAACAAACAgAAACAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Config\DeploymentConfig.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Config.EnvironmentConfig">
+    <Position X="49" Y="3.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>oAAAgAIAAAAAAABAAQAAAAgAChABAAACIAAAAEAAACg=</HashCode>
+      <FileName>Config\EnvironmentConfig.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Config.FormConfig" Collapsed="true">
+    <Position X="54.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAACAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAA=</HashCode>
+      <FileName>Config\FormConfig.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Config.ILMergeConfig" Collapsed="true">
+    <Position X="56" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAACAA=</HashCode>
+      <FileName>Config\ILMergeConfig.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Config.InternalSyncConfig" Collapsed="true">
+    <Position X="57.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgAAAAAAAAAAAAAAAAAAABAoAAACAAAAAAAAAAAAAI=</HashCode>
+      <FileName>Config\InternalSyncConfig.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Config.OrganizationConfig">
+    <Position X="47" Y="3.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>CAABABQCAABEAAAACAAIAAAABAUAAAAAIAgQAAAAQAA=</HashCode>
+      <FileName>Config\OrganizationConfig.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Config.SecurityRoleConfig" Collapsed="true">
+    <Position X="54.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAgAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Config\SecurityRoleConfig.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Config.TfsConfig">
+    <Position X="57.75" Y="4" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAQAAAQAAAAAABAAAQAAAAgAAAAAA=</HashCode>
+      <FileName>Config\TfsConfig.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Config.TfsPluginConfig" Collapsed="true">
+    <Position X="57.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAACAAAAAACAAAAAAAAEAAKAAAAAAA=</HashCode>
+      <FileName>Config\TfsPluginConfig.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Config.TfsSyncConfig" Collapsed="true">
+    <Position X="52.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAQAAACAAAAAAA=</HashCode>
+      <FileName>Config\TfsSyncConfig.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Config.UserConfig" Collapsed="true">
+    <Position X="54.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAgAAAAg=</HashCode>
+      <FileName>Config\UserConfig.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Config.XrmBuildConfig">
+    <Position X="52.25" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAACAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Config\XrmBuildConfig.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="Maximis.Toolkit.Xrm.Development.BuildManagement.Config.RepairRestoreOption" Collapsed="true">
+    <Position X="52.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAEAAAA=</HashCode>
+      <FileName>Config\OrganizationConfig.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

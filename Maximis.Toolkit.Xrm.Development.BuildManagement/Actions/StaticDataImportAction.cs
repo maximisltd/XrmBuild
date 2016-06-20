@@ -2,6 +2,7 @@
 using Maximis.Toolkit.Xrm.EntitySerialisation;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Client;
+using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -27,10 +28,8 @@ namespace Maximis.Toolkit.Xrm.Development.BuildManagement.Actions
                 return;
             }
 
-            EntityDeserialiser ser = new EntityDeserialiser();
-
-            // Get the Organizations which are configured for Import or Export
-            IEnumerable<OrganizationConfig> orgConfigs = GetOrgConfigs(envConfig, orgUniqueNames).Where(q => q.ImportData || q.ExportData.Any());
+            // Get the Organizations which are configured for Import
+            IEnumerable<OrganizationConfig> orgConfigs = GetOrgConfigs(envConfig, orgUniqueNames).Where(q => q.ImportData);
 
             // Loop through Organizations
             foreach (OrganizationConfig orgConfig in orgConfigs)
@@ -38,6 +37,9 @@ namespace Maximis.Toolkit.Xrm.Development.BuildManagement.Actions
                 OutputDivider("Data Import: " + orgConfig.FriendlyName);
                 using (OrganizationServiceProxy orgService = ServiceHelper.GetOrganizationServiceProxy(orgConfig.CrmContext))
                 {
+                    // Create Entity Deserialiser
+                    EntityDeserialiser ser = new EntityDeserialiser(new CrmContext(orgService, orgConfig.UniqueName));
+
                     // Loop through all XML files
                     foreach (string xmlFile in Directory.EnumerateFiles(fullImportDir))
                     {
@@ -48,43 +50,80 @@ namespace Maximis.Toolkit.Xrm.Development.BuildManagement.Actions
                         xd.Load(xmlFile);
 
                         // Loop through all "<ent>" elements
-                        foreach (XmlElement el in xd.DocumentElement.SelectNodes("ent"))
+                        foreach (XmlElement ent in xd.DocumentElement.SelectNodes("ent"))
                         {
-                            Entity newEntity = null;
-                            try
+                            Entity entity = DeserialiseAndCreateOrUpdate(ser, orgService, ent, config.DataImportExport);
+
+                            foreach (XmlElement rel in ent.SelectNodes("rel"))
                             {
-                                // Deserialise into Entity
-                                newEntity = ser.DeserialiseEntity(orgService, el.OuterXml);
-                            }
-                            catch (Exception ex)
-                            {
-                                Trace.WriteLine(string.Format("ERROR :: '{0}'", ex.Message));
-                                continue;
-                            }
-                            try
-                            {
-                                // Try to Create record
-                                Trace.WriteLine(string.Format("Attempting CREATE of '{0}' with id '{1:N}'", newEntity.LogicalName, newEntity.Id));
-                                orgService.Create(newEntity);
-                            }
-                            catch (Exception exCreate)
-                            {
-                                Trace.WriteLine(string.Format("ERROR :: '{0}'", exCreate.Message));
-                                try
+                                foreach (XmlElement relEnt in rel.SelectNodes("ent"))
                                 {
-                                    // Try to Update record
-                                    Trace.WriteLine(string.Format("Create failed - attempting UPDATE of '{0}' with id '{1:N}'", newEntity.LogicalName, newEntity.Id));
-                                    orgService.Update(newEntity);
-                                }
-                                catch (Exception exUpdate)
-                                {
-                                    Trace.WriteLine(string.Format("ERROR :: '{0}'", exUpdate.Message));
+                                    Entity related = DeserialiseAndCreateOrUpdate(ser, orgService, relEnt, config.DataImportExport);
+                                    try
+                                    {
+                                        UpdateHelper.RelateEntitiesLazy(orgService, entity.ToEntityReference(), related.ToEntityReference());
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Trace.WriteLine("ERROR: " + ex.Message);
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
+        }
+
+        private Entity DeserialiseAndCreateOrUpdate(EntityDeserialiser ser, OrganizationServiceProxy orgService, XmlElement ent, List<DataConfig> dataConfigs)
+        {
+            Entity entity = null;
+            try
+            {
+                // Deserialise into Entity
+                entity = ser.DeserialiseEntity(ent.OuterXml);
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(string.Format("ERROR :: '{0}'", ex.Message));
+                return null;
+            }
+
+            // Find an Existing record using an attribute other than Id
+            // Used to retrieve Calendar records by PrimaryUserId for update
+            Entity customMatch = null;
+            DataConfig dataConfig = dataConfigs.SingleOrDefault(q => q.EntityName == entity.LogicalName);
+            if (dataConfig != null && dataConfig.ExistingMatch != null && dataConfig.ExistingMatch.Any())
+            {
+                QueryExpression query = new QueryExpression(entity.LogicalName);
+                foreach (string attrName in dataConfig.ExistingMatch)
+                {
+                    if (!entity.Contains(attrName)) continue;
+                    object val = entity[attrName];
+                    if (val is EntityReference) val = ((EntityReference)val).Id;
+                    else if (val is OptionSetValue) val = ((OptionSetValue)val).Value;
+                    query.Criteria.AddCondition(attrName, ConditionOperator.Equal, val);
+                }
+                customMatch = QueryHelper.RetrieveSingleEntity(orgService, query);
+
+                if (customMatch != null)
+                {
+                    ser.IdMappings[entity.Id] = customMatch.Id;
+                    entity.Id = customMatch.Id;
+                };
+            }
+
+            try
+            {
+                Trace.WriteLine(string.Format("Attempting Create or Update of '{0}' with id '{1:N}'", entity.LogicalName, entity.Id));
+                UpdateHelper.SmartUpdate(orgService, entity, customMatch);
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(string.Format("ERROR :: '{0}'", ex.Message));
+            }
+
+            return entity;
         }
     }
 }

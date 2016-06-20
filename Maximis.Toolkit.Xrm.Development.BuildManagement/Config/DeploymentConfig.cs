@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Maximis.Toolkit.Xrm.Development.BuildManagement.Actions;
+using System.Collections.Generic;
 using System.Xml.Serialization;
 
 namespace Maximis.Toolkit.Xrm.Development.BuildManagement.Config
@@ -14,7 +15,7 @@ namespace Maximis.Toolkit.Xrm.Development.BuildManagement.Config
         public List<string> DeployFromOrgs { get; set; }
 
         [XmlAttribute]
-        public bool OverwriteUnmanaged { get; set; }
+        public SolutionImportMode Mode { get; set; }
 
         [XmlAttribute]
         public bool PublishDedupeRules

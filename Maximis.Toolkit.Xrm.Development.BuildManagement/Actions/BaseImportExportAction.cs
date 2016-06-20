@@ -1,18 +1,26 @@
 ﻿using Maximis.Toolkit.Csv;
-using Maximis.Toolkit.Tfs;
+using Maximis.Toolkit.IO;
+using Maximis.Toolkit.Xrm.Development.BuildManagement.Actions.SourceControl;
 using Maximis.Toolkit.Xrm.Development.BuildManagement.Config;
 using Maximis.Toolkit.Xrm.Development.Customisation;
 using Microsoft.Crm.Sdk.Messages;
-using Microsoft.TeamFoundation.VersionControl.Client;
+using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Client;
+using Microsoft.Xrm.Sdk.Messages;
+using Microsoft.Xrm.Sdk.Metadata;
+using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Packaging;
 using System.Linq;
+using System.Xml;
 
 namespace Maximis.Toolkit.Xrm.Development.BuildManagement.Actions
 {
+    public enum SolutionImportMode { Managed, ManagedOverwrite, Unmanaged }
+
     public abstract class BaseImportExportAction : BaseAction
     {
         protected Dictionary<string, string> managedSolutions = new Dictionary<string, string>();
@@ -20,92 +28,48 @@ namespace Maximis.Toolkit.Xrm.Development.BuildManagement.Actions
         protected Dictionary<string, string> solutionVersions = new Dictionary<string, string>();
         protected Dictionary<string, string> unmanagedSolutions = new Dictionary<string, string>();
 
-        protected void CheckSolutionsIntoSourceControl(XrmBuildConfig config, string environmentName, IEnumerable<OrganizationConfig> orgConfigs)
+        private Guid systemSolutionId = Guid.Empty;
+
+        protected void CheckSolutionsIntoSourceControl(XrmBuildConfig config, EnvironmentConfig envConfig, IEnumerable<OrganizationConfig> orgConfigs)
         {
-            if (config.TfsConfig == null || string.IsNullOrEmpty(config.TfsConfig.ProjectCollectionUri) || string.IsNullOrEmpty(config.TfsConfig.SolutionRoot)) return;
-            if (!orgConfigs.Any(q => q.TfsSync != null && q.TfsSync.CheckInSolution)) return;
+            if (!orgConfigs.Any(q => q.SourceControl != null && !string.IsNullOrEmpty(q.SourceControl.SolutionLocation))) return;
 
-            // Get Local Path where Solutions are extracted. Delete and re-create it.
-            EnvironmentConfig envConfig = config.Environments.SingleOrDefault(q => q.UniqueName == environmentName);
-            string extractPath = Path.Combine(envConfig.ExportPath, "TFS\\Solutions");
-            if (Directory.Exists(extractPath))
-            {
-                try
-                {
-                    Directory.Delete(extractPath, true);
-                    Directory.CreateDirectory(extractPath);
-                }
-                catch { }
-            }
-
-            // Get TFS Workspace
-            VersionControlServer vcs = VersionControlHelper.GetVersionControlServer(config.TfsConfig.ProjectCollectionUri);
-            Workspace ws = VersionControlHelper.GetOrCreateWorkspace(vcs, string.Format("SolutionManagement_{0}_{1}", environmentName, Environment.MachineName), config.TfsConfig.SolutionRoot, extractPath);
-
-            // Set up Check In Note object
-            CheckinNote checkInNote = null;
-            if (config.TfsConfig.CheckInNotes != null && config.TfsConfig.CheckInNotes.Any())
-            {
-                checkInNote = new CheckinNote(config.TfsConfig.CheckInNotes.Select(q => new CheckinNoteFieldValue(q.Key, q.Value)).ToArray());
-            }
-
+            // Loop through each Organization and check in each one separately
             foreach (OrganizationConfig orgConfig in orgConfigs)
             {
-                // Make sure Solution is supposed to be checked in
-                if (!unmanagedSolutions.ContainsKey(orgConfig.UniqueName) || orgConfig.TfsSync == null || !orgConfig.TfsSync.CheckInSolution) continue;
+                // Get Source Control Provider
+                BaseSourceControlProvider srcControl = GetSourceControlProvider(config.SourceControl, orgConfig.SourceControl.SolutionLocation);
 
+                // Make sure Solution can be checked in
+                if (!unmanagedSolutions.ContainsKey(orgConfig.UniqueName)) continue;
                 Trace.WriteLine(string.Format("Checking solution '{0}' into source control...", orgConfig.SolutionName));
 
-                // Define location to extract solution
-                string outputPath = Path.Combine(extractPath, orgConfig.UniqueName);
-
                 // Use SDK Solution Packager to extract solution
+                string extractPath = srcControl.GetSolutionLocalPath(orgConfig.SolutionName);
                 Process p = new Process();
-                p.StartInfo.FileName = config.TfsConfig.SolutionPackagerPath;
-                p.StartInfo.Arguments = string.Format("/action:Extract /zipfile:\"{0}\" /folder:\"{1}\" /allowDelete:Yes /clobber /nologo", unmanagedSolutions[orgConfig.UniqueName], outputPath);
+                p.StartInfo.FileName = config.SourceControl.SolutionPackagerPath;
+                p.StartInfo.Arguments = string.Format("/action:Extract /zipfile:\"{0}\" /folder:\"{1}\" /allowDelete:Yes /clobber /nologo", unmanagedSolutions[orgConfig.UniqueName], extractPath);
                 p.StartInfo.UseShellExecute = false;
                 p.Start();
                 p.WaitForExit();
 
-                // Get list of items currently in Workspace
-                string tfsPath = string.Format("{0}/{1}", config.TfsConfig.SolutionRoot, orgConfig.UniqueName);
-                IEnumerable<string> itemsInWorkspace = vcs.GetItems(tfsPath, VersionSpec.Latest, RecursionType.Full, DeletedState.NonDeleted, ItemType.File).Items.Select(q => ws.GetLocalItemForServerItem(q.ServerItem));
+                // Copy solution zip into Source Controlled directory
+                string zipCopyPath = Path.Combine(extractPath, "Zip", string.Format("{0}_unmanaged.zip", orgConfig.SolutionName));
+                FileHelper.EnsureDirectoryExists(zipCopyPath, PathType.File);
+                File.Copy(unmanagedSolutions[orgConfig.UniqueName], zipCopyPath);
 
-                // Get list of items currently in local folder
-                IEnumerable<string> itemsInLocalFolder = Directory.EnumerateFiles(outputPath, "*", SearchOption.AllDirectories);
-
-                // Identify Adds, Edits and Deletes
-                string[] deletedItems = itemsInWorkspace.Except(itemsInLocalFolder).ToArray();
-                if (deletedItems.Length > 0) ws.PendDelete(deletedItems);
-                string[] addedItems = itemsInLocalFolder.Except(itemsInWorkspace).ToArray();
-                if (addedItems.Length > 0) ws.PendAdd(addedItems);
-                string[] updatedItems = itemsInLocalFolder.Except(addedItems).ToArray();
-                if (updatedItems.Length > 0) ws.PendEdit(updatedItems);
-
-                // Commit Pending Changes
-                PendingChange[] pendingChanges = ws.GetPendingChanges();
-                if (pendingChanges.Length > 0)
-                {
-                    Trace.Write("Checking in...");
-                    string description = string.Format("Solution '{0}' Version '{1}'", orgConfig.SolutionName, GetSolutionVersion(orgConfig.UniqueName));
-                    int changeSet = ws.CheckIn(new WorkspaceCheckInParameters(pendingChanges, description) { CheckinNotes = checkInNote });
-                    Trace.WriteLine(string.Format("Done: changeset '{0}'.", changeSet));
-                }
-                else
-                {
-                    Trace.WriteLine("Nothing to check in!");
-                }
+                // Check In Files
+                srcControl.CheckInFiles(new CheckInOptions { Description = string.Format("Solution '{0}' Version '{1}'", orgConfig.SolutionName, GetSolutionVersion(orgConfig.UniqueName)) });
             }
         }
 
-        protected void ExportSolutions(string exportFolderPath, IEnumerable<OrganizationConfig> orgConfigs, bool incrementVersion = true, string targetVersion = null, bool exportUnmanaged = true, bool exportManaged = true)
+        protected void ExportSolutions(string exportFolderPath, IEnumerable<OrganizationConfig> orgConfigs, bool exportManaged, bool incrementVersion = true, string targetVersion = null)
         {
             foreach (OrganizationConfig orgConfig in orgConfigs)
             {
                 // Skip if  solutions have already been exported
                 bool unmanagedExported = unmanagedSolutions.ContainsKey(orgConfig.UniqueName);
                 bool managedExported = managedSolutions.ContainsKey(orgConfig.UniqueName);
-                if (unmanagedExported && (managedExported || !exportManaged)) continue;
                 if (unmanagedExported && (managedExported || !exportManaged)) continue;
 
                 string solutionExportPath = Path.Combine(exportFolderPath, "Solutions", orgConfig.UniqueName);
@@ -129,7 +93,7 @@ namespace Maximis.Toolkit.Xrm.Development.BuildManagement.Actions
                     }
 
                     // Export Unmanaged
-                    if (exportUnmanaged && !unmanagedSolutions.ContainsKey(orgConfig.UniqueName))
+                    if (!unmanagedSolutions.ContainsKey(orgConfig.UniqueName))
                         unmanagedSolutions.Add(orgConfig.UniqueName, SolutionHelper.ExportSolution(orgService, orgConfig.SolutionName, false, solutionExportPath, true, targetVersion));
 
                     // Export Managed
@@ -145,18 +109,32 @@ namespace Maximis.Toolkit.Xrm.Development.BuildManagement.Actions
             return solutionVersions.ContainsKey(orgConfigName) ? solutionVersions[orgConfigName] : "[Unknown]";
         }
 
-        protected void ImportManagedSolutions(OrganizationServiceProxy orgService, IEnumerable<string> solutionsToImport, string importOrgUniqueName, bool overwriteUnmanaged, bool importAsync)
+        protected bool ImportSolutions(OrganizationServiceProxy orgService, string importOrgUniqueName, SolutionImportMode importMode, bool importAsync, params string[] solutionsToImport)
         {
+            bool solutionsImported = false;
             foreach (string toImport in solutionsToImport)
             {
-                if (!managedSolutions.ContainsKey(toImport)) continue;
+                if (importMode == SolutionImportMode.Unmanaged)
+                {
+                    if (!unmanagedSolutions.ContainsKey(toImport)) continue;
 
-                Trace.WriteLine(string.Format("[Import Managed Solution '{0}' into Organization '{1}']", solutionNames[toImport], importOrgUniqueName));
-                SolutionHelper.ImportSolution(orgService, managedSolutions[toImport], importAsync: importAsync, overwriteUnmanaged: overwriteUnmanaged, publishDedupeRules: true);
+                    Trace.WriteLine(string.Format("[Import Unmanaged Solution '{0}' into Organization '{1}']", solutionNames[toImport], importOrgUniqueName));
+                    SolutionHelper.ImportSolution(orgService, unmanagedSolutions[toImport], importAsync: importAsync, publishDedupeRules: true);
+                    solutionsImported = true;
+                }
+                else
+                {
+                    if (!managedSolutions.ContainsKey(toImport)) continue;
+
+                    Trace.WriteLine(string.Format("[Import Managed Solution '{0}' into Organization '{1}']", solutionNames[toImport], importOrgUniqueName));
+                    SolutionHelper.ImportSolution(orgService, managedSolutions[toImport], importAsync: importAsync, overwriteUnmanaged: importMode == SolutionImportMode.ManagedOverwrite, publishDedupeRules: true);
+                    solutionsImported = true;
+                }
             }
+            return solutionsImported;
         }
 
-        protected void ImportSolutionsInternalSync(IEnumerable<OrganizationConfig> orgConfigs, bool importAsync, bool importSelf = false)
+        protected void ImportSolutionsInternalSync(IEnumerable<OrganizationConfig> orgConfigs, bool importAsync, bool importSelf, PostDeploymentConfig pdConfig)
         {
             foreach (OrganizationConfig orgConfig in orgConfigs)
             {
@@ -167,7 +145,7 @@ namespace Maximis.Toolkit.Xrm.Development.BuildManagement.Actions
                     // First install managed solutions (dependencies)
                     if (orgConfig.InternalSync != null && orgConfig.InternalSync.ImportManaged != null)
                     {
-                        ImportManagedSolutions(orgService, orgConfig.InternalSync.ImportManaged, orgConfig.UniqueName, orgConfig.InternalSync.OverwriteUnmanaged, importAsync);
+                        ImportSolutions(orgService, orgConfig.UniqueName, orgConfig.InternalSync.OverwriteUnmanaged ? SolutionImportMode.ManagedOverwrite : SolutionImportMode.Managed, importAsync, orgConfig.InternalSync.ImportManaged.ToArray());
                     }
 
                     // Then install unmanaged solutions
@@ -175,16 +153,12 @@ namespace Maximis.Toolkit.Xrm.Development.BuildManagement.Actions
                     {
                         foreach (string toImport in orgConfig.InternalSync.ImportUnmanaged)
                         {
-                            if (!unmanagedSolutions.ContainsKey(toImport)) continue;
-
-                            Trace.WriteLine(string.Format("[Import Unmanaged Solution '{0}' into Organization '{1}']", solutionNames[toImport], orgConfig.UniqueName));
-                            SolutionHelper.ImportSolution(orgService, unmanagedSolutions[toImport], importAsync: importAsync, overwriteUnmanaged: true, publishDedupeRules: true);
+                            needsPublish |= ImportSolutions(orgService, orgConfig.UniqueName, SolutionImportMode.Unmanaged, importAsync, toImport);
 
                             if (orgConfig.InternalSync.MergeUnmanaged)
                             {
                                 // Ensure everything in imported unmanaged solution is in global unmanaged solution
                                 SolutionHelper.SyncSolutionComponents(orgService, solutionNames[toImport], orgConfig.SolutionName);
-                                needsPublish = true;
 
                                 // Delete imported solution (now we have copied everything from it)
                                 SolutionHelper.DeleteSolution(orgService, solutionNames[toImport]);
@@ -223,7 +197,233 @@ namespace Maximis.Toolkit.Xrm.Development.BuildManagement.Actions
 
                     // Publish Customisations
                     if (needsPublish) SolutionHelper.PublishAllCustomisations(orgService);
+
+                    // Perform Post Deployment Steps
+                    PerformPostDeploymentSteps(orgService, pdConfig);
                 }
+            }
+        }
+
+        protected void PerformPostDeploymentSteps(IOrganizationService orgService, PostDeploymentConfig pdConfig)
+        {
+            CrmContext context = new CrmContext(orgService);
+            bool needsPublish = false;
+
+            if (pdConfig.DisableSystemBPFs)
+            {
+                // Disable OOB Process Flows
+                OutputDivider("Disabling OOB Business Process Flows");
+
+                QueryExpression query = new QueryExpression("workflow") { ColumnSet = new ColumnSet("name") };
+                query.Criteria.AddCondition("category", ConditionOperator.Equal, 4);
+                query.Criteria.AddCondition("type", ConditionOperator.Equal, 1);
+                query.Criteria.AddCondition("statecode", ConditionOperator.Equal, 1);
+                query.Criteria.AddCondition("solutionid", ConditionOperator.Equal, GetSystemSolutionId(orgService));
+                foreach (Entity bpfEntity in orgService.RetrieveMultiple(query).Entities)
+                {
+                    Trace.WriteLine(string.Format("Disabling Process Flow '{0}'", bpfEntity.GetAttributeValue<string>("name")));
+                    UpdateHelper.SetEntityState(orgService, bpfEntity.ToEntityReference(), 0, 1);
+                }
+            }
+
+            if (pdConfig.DisableSystemForms)
+            {
+                OutputDivider("Disabling OOB Forms for Entities with replacement Forms");
+
+                // Find Unmanaged Main Forms
+                QueryExpression query = new QueryExpression("systemform") { ColumnSet = new ColumnSet("objecttypecode") };
+                query.Criteria.AddCondition("type", ConditionOperator.Equal, (int)FormType.Main);
+                query.Criteria.AddCondition("ismanaged", ConditionOperator.Equal, false);
+                query.Criteria.AddCondition("formactivationstate", ConditionOperator.Equal, 1);
+                EntityCollection customForms = orgService.RetrieveMultiple(query);
+
+                // Get list of Entities
+                object[] entities = customForms.Entities.Select(q => q["objecttypecode"]).Distinct().OrderBy(q => q).ToArray();
+                if (entities.Any())
+                {
+                    // Disable Managed forms for those Entities
+                    query = new QueryExpression("systemform") { ColumnSet = new ColumnSet("name", "objecttypecode") };
+                    query.Criteria.AddCondition("type", ConditionOperator.Equal, (int)FormType.Main);
+                    query.Criteria.AddCondition("ismanaged", ConditionOperator.Equal, true);
+                    query.Criteria.AddCondition("formactivationstate", ConditionOperator.Equal, 1);
+                    query.Criteria.AddCondition("objecttypecode", ConditionOperator.In, entities);
+                    foreach (Entity systemForm in orgService.RetrieveMultiple(query).Entities)
+                    {
+                        Trace.WriteLine(string.Format("Disabling {0} Form '{1}'", systemForm.GetAttributeValue<string>("objecttypecode"), systemForm.GetAttributeValue<string>("name")));
+                        FormHelper.DeactivateForm(orgService, systemForm.Id);
+                        needsPublish = true;
+                    }
+                }
+            }
+
+            if (pdConfig.DeleteSystemOptionSetValues.Any())
+            {
+                OutputDivider("Deleting unwanted OOB Option Set Values");
+                foreach (SystemOptionSetValueConfig osValue in pdConfig.DeleteSystemOptionSetValues)
+                {
+                    EnumAttributeMetadata attrMeta = MetadataHelper.GetAttributeMetadata(context, osValue.EntityName, osValue.AttributeName) as EnumAttributeMetadata;
+                    if (attrMeta == null) continue;
+                    foreach (string unwantedOption in osValue.UnwantedOptions)
+                    {
+                        OptionMetadata optionToRemove = attrMeta.OptionSet.Options.SingleOrDefault(q => q.Label.UserLocalizedLabel.Label == unwantedOption);
+                        if (optionToRemove != null)
+                        {
+                            Trace.WriteLine(string.Format("Removing '{0}' from {1}/{2}", unwantedOption, osValue.EntityName, osValue.AttributeName));
+                            orgService.Execute(new DeleteOptionValueRequest { AttributeLogicalName = attrMeta.LogicalName, EntityLogicalName = attrMeta.EntityLogicalName, Value = optionToRemove.Value.Value });
+                            needsPublish = true;
+                        }
+                    }
+                }
+            }
+
+            if (pdConfig.CheckUnmanagedEntityPrivileges)
+            {
+                OutputDivider("Identifying inaccessible Unmanaged Entities");
+
+                // Get All Privileges
+                Dictionary<Guid, string> allPrivileges = SecurityHelper.RetrieveAllPrivileges(orgService);
+
+                // Get Unmanaged Roles
+                QueryExpression query = new QueryExpression("role") { ColumnSet = new ColumnSet("name") };
+                query.Criteria.AddCondition("ismanaged", ConditionOperator.Equal, false);
+                IEnumerable<string> unmanagedRoles = orgService.RetrieveMultiple(query).Entities.Select(q => q.GetAttributeValue<string>("name"));
+
+                // Get Unmanaged Entities
+                EntityMetadata[] allMeta = MetadataHelper.GetAllEntityMetadata(orgService, EntityFilters.Entity);
+                Dictionary<string, bool> entityAccessibility = allMeta.Where(q => !q.IsManaged.Value && !q.IsIntersect.Value && !q.IsActivity.Value).Select(q => q.LogicalName).OrderBy(q => q).ToDictionary(k => k, v => false);
+
+                // Loop through Unmanaged Roles
+                foreach (string role in unmanagedRoles)
+                {
+                    // Get Privileges for those Roles
+                    RolePrivilege[] rolePrivileges = SecurityHelper.GetRolePrivileges(orgService, role);
+
+                    // Loop through Unmanaged Entities
+                    foreach (string entityName in entityAccessibility.Keys.ToArray())
+                    {
+                        // Update if role has a privilege on that Entity
+                        entityAccessibility[entityName] |= rolePrivileges.Any(q => allPrivileges[q.PrivilegeId].EndsWith(entityName));
+                    }
+                }
+
+                IEnumerable<string> inaccessibleEntities = entityAccessibility.Where(q => !q.Value).Select(q => q.Key);
+                if (inaccessibleEntities.Any())
+                {
+                    Trace.WriteLine("*** WARNING *** The security privileges for these Entities may not be set:");
+                    Trace.WriteLine(string.Join(", ", inaccessibleEntities.ToArray()));
+                }
+            }
+
+            if (pdConfig.DeleteDefaultSubject)
+            {
+                OutputDivider("Deleting Default Subject");
+                QueryExpression query = new QueryExpression("subject");
+                query.Criteria.AddCondition("title", ConditionOperator.Equal, "Default Subject");
+                EntityCollection ec = orgService.RetrieveMultiple(query);
+                if (ec.Entities.Count == 0)
+                {
+                    Trace.WriteLine("Default Subject not found.");
+                }
+                else
+                {
+                    Trace.WriteLine(string.Format("Deleting {0} Subject records.", ec.Entities.Count));
+                }
+            }
+
+            if (needsPublish) SolutionHelper.PublishAllCustomisations(orgService);
+        }
+
+        protected bool SyncRibbons(OrganizationConfig orgConfig, SyncRibbonConfig syncRibbonConfig)
+        {
+            SolutionDefinition sd = new SolutionDefinition
+            {
+                PublisherId = syncRibbonConfig.PublisherId,
+                UniqueName = "ribbonsync",
+                FriendlyName = "Ribbon Sync"
+            };
+
+            bool solutionsCreated = false;
+
+            using (OrganizationServiceProxy syncFromSvc = ServiceHelper.GetOrganizationServiceProxy(syncRibbonConfig.OrgConfig.CrmContext))
+            using (OrganizationServiceProxy syncToSvc = ServiceHelper.GetOrganizationServiceProxy(orgConfig.CrmContext))
+            {
+                Trace.WriteLine("Retrieving Metadata...");
+                EntityMetadata[] fromMeta = MetadataHelper.GetAllEntityMetadata(syncFromSvc, EntityFilters.Entity);
+                EntityMetadata[] toMeta = MetadataHelper.GetAllEntityMetadata(syncToSvc, EntityFilters.Entity);
+
+                foreach (Entity sc in SolutionHelper.RetrieveSolutionComponents(syncToSvc, orgConfig.SolutionName, ComponentType.Entity).Entities)
+                {
+                    // Get the Entity Metadata in both Organizations
+                    EntityMetadata toEntity = toMeta.Single(q => q.MetadataId.Value == sc.GetAttributeValue<Guid>("objectid"));
+                    EntityMetadata fromEntity = fromMeta.Single(q => q.LogicalName == toEntity.LogicalName);
+
+                    // Get the Entity Ribbon from both Organizations
+                    XmlDocument fromRibbon = RibbonHelper.RetrieveEntityRibbonXml(syncFromSvc, fromEntity.LogicalName);
+                    XmlDocument toRibbon = RibbonHelper.RetrieveEntityRibbonXml(syncToSvc, toEntity.LogicalName);
+
+                    // If they are different
+                    Trace.Write(string.Format("Comparing Entity '{0}'...", toEntity.LogicalName));
+                    if (fromRibbon.OuterXml != toRibbon.OuterXml)
+                    {
+                        Trace.WriteLine("DIFFERENT");
+
+                        // Clear or Create solutions
+                        if (solutionsCreated)
+                        {
+                            SolutionHelper.RemoveAllSolutionComponents(syncFromSvc, sd.UniqueName);
+                            SolutionHelper.RemoveAllSolutionComponents(syncToSvc, sd.UniqueName);
+                        }
+                        else
+                        {
+                            SolutionHelper.CreateSolution(syncFromSvc, sd);
+                            SolutionHelper.CreateSolution(syncToSvc, sd);
+                            solutionsCreated = true;
+                        }
+
+                        // Add Entity to each Solution
+                        SolutionHelper.AddSolutionComponent(syncFromSvc, sd.UniqueName, fromEntity.MetadataId.Value, ComponentType.Entity);
+                        SolutionHelper.AddSolutionComponent(syncToSvc, sd.UniqueName, toEntity.MetadataId.Value, ComponentType.Entity);
+
+                        // Export Solutions from each Organization
+                        string fromSolution = SolutionHelper.ExportSolution(syncFromSvc, sd.UniqueName, false, Path.Combine(syncRibbonConfig.ExportPath, "RibbonSync\\SyncFrom"));
+                        string toSolution = SolutionHelper.ExportSolution(syncToSvc, sd.UniqueName, false, Path.Combine(syncRibbonConfig.ExportPath, "RibbonSync\\SyncTo"));
+
+                        // Read the Ribbon from the "From" ("correct") Solution
+                        string ribbonXml = null;
+                        using (Package package = Package.Open(fromSolution))
+                        {
+                            PackagePart part = package.GetPart(new Uri("/customizations.xml", UriKind.Relative));
+                            XmlDocument xd = new XmlDocument();
+                            xd.Load(part.GetStream());
+                            ribbonXml = xd.SelectSingleNode("//RibbonDiffXml").InnerXml;
+                        }
+
+                        // Update the "To" Solution with the same XML
+                        using (Package package = Package.Open(toSolution))
+                        {
+                            PackagePart part = package.GetPart(new Uri("/customizations.xml", UriKind.Relative));
+                            XmlDocument xd = new XmlDocument();
+                            xd.Load(part.GetStream());
+                            xd.SelectSingleNode("//RibbonDiffXml").InnerXml = ribbonXml;
+                            xd.Save(part.GetStream());
+                        }
+
+                        // Import the Solution
+                        SolutionHelper.ImportSolution(syncToSvc, toSolution, syncRibbonConfig.ImportSolutionsAsync);
+                    }
+                    else
+                    {
+                        Trace.WriteLine("SAME");
+                    }
+                }
+
+                if (solutionsCreated)
+                {
+                    SolutionHelper.DeleteSolution(syncFromSvc, sd.UniqueName);
+                    SolutionHelper.DeleteSolution(syncToSvc, sd.UniqueName);
+                    return true;
+                }
+                return false;
             }
         }
 
@@ -231,6 +431,17 @@ namespace Maximis.Toolkit.Xrm.Development.BuildManagement.Actions
         {
             PrivilegeDepth depth = (PrivilegeDepth)Enum.Parse(typeof(PrivilegeDepth), depthName);
             return (int)depth;
+        }
+
+        private Guid GetSystemSolutionId(IOrganizationService orgService)
+        {
+            if (systemSolutionId == Guid.Empty)
+            {
+                QueryExpression query = new QueryExpression("solution");
+                query.Criteria.AddCondition("uniquename", ConditionOperator.Equal, "System");
+                systemSolutionId = QueryHelper.RetrieveSingleEntity(orgService, query).Id;
+            }
+            return systemSolutionId;
         }
 
         private void MergePrivileges(string toUpdatePath, List<string> toMergePaths)

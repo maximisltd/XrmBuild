@@ -1,4 +1,5 @@
 ﻿using Maximis.Toolkit.Xrm.Development.BuildManagement.Config;
+using Maximis.Toolkit.Xrm.Development.Customisation;
 using Microsoft.Xrm.Sdk.Client;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,12 +22,17 @@ namespace Maximis.Toolkit.Xrm.Development.BuildManagement.Actions
                 OutputDivider("Deployment: " + targetOrg.FriendlyName);
 
                 // Export the Source solutions
-                ExportSolutions(envConfig.ExportPath, allOrgConfigs.Where(q => targetOrg.Deployment.DeployFromOrgs.Contains(q.UniqueName)), false, targetOrg.CrmContext.Version);
+                ExportSolutions(envConfig.ExportPath,
+                    allOrgConfigs.Where(q => targetOrg.Deployment.DeployFromOrgs.Contains(q.UniqueName)),
+                    targetOrg.Deployment.Mode != SolutionImportMode.Unmanaged, false, targetOrg.CrmContext.Version);
 
                 // Import the managed versions into the target environment
                 using (OrganizationServiceProxy orgService = ServiceHelper.GetOrganizationServiceProxy(targetOrg.CrmContext))
                 {
-                    ImportManagedSolutions(orgService, targetOrg.Deployment.DeployFromOrgs, targetOrg.UniqueName, targetOrg.Deployment.OverwriteUnmanaged, envConfig.ImportSolutionsAsync);
+                    ImportSolutions(orgService, targetOrg.UniqueName, targetOrg.Deployment.Mode, envConfig.ImportSolutionsAsync, targetOrg.Deployment.DeployFromOrgs.ToArray());
+                    if (targetOrg.Deployment.Mode == SolutionImportMode.Unmanaged) SolutionHelper.PublishAllCustomisations(orgService);
+
+                    PerformPostDeploymentSteps(orgService, config.PostDeployment);
                 }
             }
         }

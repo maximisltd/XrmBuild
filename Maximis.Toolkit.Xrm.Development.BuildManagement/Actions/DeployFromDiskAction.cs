@@ -13,14 +13,17 @@ namespace Maximis.Toolkit.Xrm.Development.BuildManagement.Actions
             // Get the Environment being DEPLOYED TO (i.e. LIVE or TEST environment)
             EnvironmentConfig envConfig = config.Environments.SingleOrDefault(q => q.UniqueName == environmentName);
 
-            // Build a Managed Solutions list from solutions located on disk
+            // Build a list from solutions located on disk
             foreach (OrganizationConfig orgConfig in config.Environments.SelectMany(q => q.Organizations))
             {
                 string solutionExportPath = Path.Combine(envConfig.ExportPath, "Solutions", orgConfig.UniqueName);
                 if (!Directory.Exists(solutionExportPath)) continue;
 
-                string latestFile = Directory.EnumerateFiles(solutionExportPath, "*_managed.zip").OrderByDescending(q => q).FirstOrDefault();
-                if (!string.IsNullOrEmpty(latestFile)) managedSolutions.Add(orgConfig.UniqueName, latestFile);
+                string latestManagedFile = Directory.EnumerateFiles(solutionExportPath, "*_managed.zip").OrderByDescending(q => q).FirstOrDefault();
+                if (!string.IsNullOrEmpty(latestManagedFile)) managedSolutions.Add(orgConfig.UniqueName, latestManagedFile);
+
+                string latestUnmanagedFile = Directory.EnumerateFiles(solutionExportPath, "*_unmanaged.zip").OrderByDescending(q => q).FirstOrDefault();
+                if (!string.IsNullOrEmpty(latestUnmanagedFile)) unmanagedSolutions.Add(orgConfig.UniqueName, latestUnmanagedFile);
             }
 
             // Loop through each target environment
@@ -31,7 +34,7 @@ namespace Maximis.Toolkit.Xrm.Development.BuildManagement.Actions
                 using (OrganizationServiceProxy orgService = ServiceHelper.GetOrganizationServiceProxy(targetOrg.CrmContext))
                 {
                     // Import the managed solutions into the target environment
-                    ImportManagedSolutions(orgService, targetOrg.Deployment.DeployFromDisk, targetOrg.UniqueName, targetOrg.Deployment.OverwriteUnmanaged, envConfig.ImportSolutionsAsync);
+                    ImportSolutions(orgService, targetOrg.UniqueName, targetOrg.Deployment.Mode, envConfig.ImportSolutionsAsync, targetOrg.Deployment.DeployFromDisk.ToArray());
 
                     // Import Security Roles
                     foreach (string deployFrom in targetOrg.Deployment.DeployFromDisk)

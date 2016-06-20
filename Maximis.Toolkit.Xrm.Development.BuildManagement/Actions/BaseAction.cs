@@ -1,4 +1,5 @@
-﻿using Maximis.Toolkit.Xrm.Development.BuildManagement.Config;
+﻿using Maximis.Toolkit.Xrm.Development.BuildManagement.Actions.SourceControl;
+using Maximis.Toolkit.Xrm.Development.BuildManagement.Config;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -8,6 +9,23 @@ namespace Maximis.Toolkit.Xrm.Development.BuildManagement.Actions
 {
     public abstract class BaseAction
     {
+        protected BaseSourceControlProvider GetSourceControlProvider(SourceControlConfig scConfig, string locationName)
+        {
+            if (scConfig.Tfs != null && scConfig.Tfs.ProjectCollections != null)
+            {
+                TfsProjectCollectionConfig pcConfig = scConfig.Tfs.ProjectCollections.SingleOrDefault(q => q.LocationName == locationName);
+                if (pcConfig != null) return new TfsProvider(scConfig, pcConfig);
+            }
+
+            if (scConfig.Git != null && scConfig.Git.Repositories != null)
+            {
+                GitRepositoryConfig repoConfig = scConfig.Git.Repositories.SingleOrDefault(q => q.LocationName == locationName);
+                if (repoConfig != null) return new GitProvider(scConfig, repoConfig);
+            }
+
+            throw new Exception(string.Format("Could not find Source Control Location '{0}'", locationName));
+        }
+
         protected Dictionary<string, string> solutionNames = new Dictionary<string, string>();
 
         public void PerformAction(XrmBuildConfig config, string environmentName, params string[] orgUniqueNames)
@@ -16,7 +34,7 @@ namespace Maximis.Toolkit.Xrm.Development.BuildManagement.Actions
             {
                 foreach (OrganizationConfig orgConfig in envConfig.Organizations)
                 {
-                    orgConfig.CrmContext = new CrmContext
+                    orgConfig.CrmContext = new CrmConnectionInfo
                     {
                         AuthenticationProviderType = envConfig.AuthenticationProviderType,
                         Domain = envConfig.Domain,

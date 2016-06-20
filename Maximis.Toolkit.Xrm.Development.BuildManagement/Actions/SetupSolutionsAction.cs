@@ -22,7 +22,7 @@ namespace Maximis.Toolkit.Xrm.Development.BuildManagement.Actions
                     SolutionDefinition solution = new SolutionDefinition
                     {
                         UniqueName = orgConfig.SolutionName,
-                        FriendlyName = orgConfig.FriendlyName,
+                        FriendlyName = orgConfig.SolutionFriendlyName,
                         PublisherId = OrganizationHelper.CreatePublisher(orgService, config.Publisher)
                     };
                     SolutionHelper.CreateSolution(orgService, solution);
